@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首爾冬季浪漫行 2026 🇰🇷 (行程手冊)</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --kakao-yellow: #FEE500;
+            --kakao-brown: #3A1D1D;
+            --ryan-orange: #FF9F00;
+            --apeach-pink: #FFC0CB;
+            --bg-color: #FFF8F0;
+            --card-bg: #FFFFFF;
+            --accent-blue: #56CCF2;
+            --naver-green: #03C75A;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--kakao-brown);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+            line-height: 1.6;
+            /* 背景裝飾：淡黃色圓點 */
+            background-image: radial-gradient(#FFD54F 15%, transparent 16%), radial-gradient(#FFD54F 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            background-color: #FFFDE7;
+        }
+
+        /* 標題區 */
+        header {
+            background-color: var(--kakao-yellow);
+            padding: 25px 15px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(58, 29, 29, 0.1);
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--kakao-brown);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            margin-top: 8px;
+            color: #554;
+            font-weight: 700;
+            background: rgba(255,255,255,0.5);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+        }
+
+        /* 日期導航列 */
+        .nav-wrapper {
+            padding: 15px 0 5px;
+            position: sticky;
+            top: 90px;
+            z-index: 900;
+            background: linear-gradient(to bottom, rgba(255,253,231,0.95), rgba(255,253,231,0));
+        }
+
+        .nav-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 15px 15px;
+            gap: 12px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-container::-webkit-scrollbar { display: none; }
+
+        .day-btn {
+            background: #fff;
+            border: 3px solid var(--kakao-yellow);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            color: var(--kakao-brown);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            flex-shrink: 0;
+            font-weight: 800;
+            box-shadow: 0 3px 0 rgba(220, 200, 0, 0.5);
+        }
+
+        .day-btn.active {
+            background-color: var(--kakao-brown);
+            color: var(--kakao-yellow);
+            border-color: var(--kakao-brown);
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        /* 主內容區 */
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 天氣卡片 */
+        .weather-card {
+            background: #fff;
+            color: var(--kakao-brown);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 10px 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 4px solid var(--accent-blue);
+            box-shadow: 0 6px 0 rgba(86, 204, 242, 0.4);
+            position: relative;
+        }
+        .weather-info h2 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .weather-info p { margin: 5px 0 0; font-size: 1rem; font-weight: 600; color: #666; }
+        .weather-icon { font-size: 3.5rem; }
+
+        /* 行程時間軸 */
+        .timeline {
+            position: relative;
+            padding-left: 25px;
+            border-left: 5px dotted #ddd;
+            margin-left: 10px;
+        }
+
+        .event-card {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px; /* 因為沒有圖片，間距稍微縮小一點 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 2px solid #fff;
+            transition: transform 0.2s;
+        }
+
+        /* 類型標籤 (邊框顏色) */
+        .event-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 18px;
+            border: 3px solid transparent;
+            pointer-events: none;
+        }
+        .event-card[data-type="spot"] { border-color: var(--kakao-yellow); }
+        .event-card[data-type="food"] { border-color: var(--apeach-pink); }
+        .event-card[data-type="shopping"] { border-color: var(--ryan-orange); }
+        .event-card[data-type="transport"], .event-card[data-type="hotel"] { 
+            border-color: #eee; background: #fafafa; opacity: 0.95;
+        }
+
+        /* 左側圓點圖示 */
+        .event-card::before {
+            content: ''; 
+            position: absolute;
+            left: -44px;
+            top: 20px;
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border-radius: 50%;
+            border: 4px solid #ccc;
+            z-index: 2;
+            text-align: center;
+            line-height: 28px;
+            font-size: 16px;
+        }
+        .event-card[data-type="spot"]::before { content: '📸'; border-color: var(--kakao-yellow); }
+        .event-card[data-type="food"]::before { content: '🥘'; border-color: var(--apeach-pink); }
+        .event-card[data-type="shopping"]::before { content: '🛍️'; border-color: var(--ryan-orange); }
+        .event-card[data-type="transport"]::before { content: '🚌'; border-color: var(--accent-blue); }
+        .event-card[data-type="hotel"]::before { content: '🏠'; border-color: #aaa; }
+
+        .time-tag {
+            display: inline-block;
+            background-color: #eee;
+            color: #555;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .event-card[data-type="spot"] .time-tag { background-color: var(--kakao-yellow); color: var(--kakao-brown); }
+        .event-card[data-type="food"] .time-tag { background-color: var(--apeach-pink); color: #fff; }
+        .event-card[data-type="shopping"] .time-tag { background-color: var(--ryan-orange); color: #fff; }
+
+        .location-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            color: var(--kakao-brown);
+        }
+
+        .kr-name {
+            font-size: 0.95rem;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: #444;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        /* Naver Map 按鈕樣式 */
+        .naver-map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--naver-green);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 8px;
+            transition: background 0.2s;
+            box-shadow: 0 3px 6px rgba(3, 199, 90, 0.2);
+        }
+        .naver-map-btn:hover {
+            background-color: #02b350;
+            transform: translateY(-1px);
+        }
+
+        /* 備忘錄區塊 */
+        .memo-section {
+            background-color: #fff;
+            border: 3px solid var(--kakao-brown);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-top: 40px;
+            position: relative;
+            box-shadow: 5px 5px 0 rgba(58, 29, 29, 0.2);
+        }
+
+        .memo-icon {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background: var(--kakao-brown);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: 800;
+            color: var(--kakao-yellow);
+            font-size: 1rem;
+            transform: rotate(-2deg);
+        }
+
+        .memo-content ul { padding-left: 20px; margin: 10px 0 0 0; }
+        .memo-content li { margin-bottom: 10px; font-size: 0.95rem; color: #444; }
+        .memo-content strong { color: #E65100; background: linear-gradient(to top, #ffe0b2 40%, transparent 40%); }
+
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 50px;
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🐻 首爾冬季浪漫行 🍑</h1>
+        <div class="subtitle">2026/01/23 - 01/31</div>
+    </header>
+
+    <div class="nav-wrapper">
+        <div class="nav-container" id="nav-container"></div>
+    </div>
+
+    <div class="container">
+        <div class="weather-card">
+            <div class="weather-info">
+                <h2 id="day-display">Day 1</h2>
+                <p id="weather-display">氣溫 -3°C | 晴朗</p>
+            </div>
+            <div class="weather-icon" id="weather-icon-display">🌤️</div>
+        </div>
+
+        <div class="timeline" id="timeline-container"></div>
+
+        <div class="memo-section">
+            <div class="memo-icon">💡 交通 & 攻略筆記</div>
+            <div class="memo-content" id="memo-container"></div>
+        </div>
+
+        <footer>
+            Designed for 2026 Seoul Trip <br>
+            Have a nice trip! ✈️
+        </footer>
+    </div>
+
+    <script>
+        // 🔹 行程資料 (純文字版) 🔹
+        
+        const tripData = [
+            {
+                day: "Day 1", date: "1/23 (五)", title: "抵達 & 永登浦", weather: { temp: "-3°C", text: "晴時多雲", icon: "🌤️" },
+                events: [
+                    { time: "07:05", title: "桃園機場起飛", kr: "BR170", desc: "帶著護照出發！", type: "transport" },
+                    { time: "11:30", title: "搭乘 AREX 機場快線", kr: "공항철도", desc: "搭普通車至弘大轉 2 號線", type: "transport" },
+                    { time: "13:00", title: "抵達 堂山站民宿", kr: "당산역", desc: "Check-in 放行李", type: "hotel" },
+                    { time: "14:30", title: "永登浦地下街", kr: "영등포지하상가", desc: "午餐 & 挖寶平價服飾", type: "shopping" },
+                    { time: "15:30", title: "Daiso 大創", kr: "다이소 영등포점", desc: "生活小物採購", type: "shopping" },
+                    { time: "17:00", title: "時代廣場 & E-mart", kr: "타임스퀘어", desc: "大型購物中心逛街", type: "shopping" },
+                    { time: "19:30", title: "晚餐 & 返回民宿", kr: "저녁식사", desc: "回堂山站休息", type: "hotel" }
+                ],
+                memos: ["機場交通：搭 AREX 普通車至弘大轉 2 號線最省錢。", "地下街：適合買平價衣服，時代廣場適合逛品牌。"]
+            },
+            {
+                day: "Day 2", date: "1/24 (六)", title: "傳統市場 & 韓屋", weather: { temp: "-5°C", text: "多雲", icon: "☁️" },
+                events: [
+                    { time: "10:15", title: "廣藏市場", kr: "광장시장", desc: "必吃：綠豆煎餅、生拌牛肉", type: "food" },
+                    { time: "13:00", title: "仁寺洞主街", kr: "인사동", desc: "逛 Ssamzigil 文創商場", type: "spot" },
+                    { time: "15:15", title: "益善洞韓屋村", kr: "익선동", desc: "韓屋咖啡廳下午茶、拍照", type: "spot" },
+                    { time: "18:00", title: "晚餐", kr: "익선동 맛집", desc: "周邊享用美食", type: "food" }
+                ],
+                memos: ["散步路線：廣藏市場 → 清溪川 → 仁寺洞 → 益善洞。", "回程：鐘路3街搭 5 號線轉 2 號線回堂山。"]
+            },
+            {
+                day: "Day 3", date: "1/25 (日)", title: "聖水洞 & 明洞", weather: { temp: "-4°C", text: "晴朗", icon: "☀️" },
+                events: [
+                    { time: "10:15", title: "聖水洞 (Dior)", kr: "성수동 디올", desc: "網美牆打卡、咖啡街漫步", type: "spot" },
+                    { time: "11:30", title: "SM 娛樂總部", kr: "광야 서울", desc: "K-POP 粉絲必看巨大 LED", type: "spot" },
+                    { time: "14:00", title: "建大 Common Ground", kr: "커먼그라운드", desc: "藍色貨櫃屋商場", type: "spot" },
+                    { time: "17:00", title: "明洞漫畫街", kr: "재미로", desc: "可愛卡通街拍 (3號出口)", type: "spot" },
+                    { time: "18:30", title: "Daiso 明洞旗艦店", kr: "다이소 명동역점", desc: "挑戰 12 層樓高的大創", type: "shopping" },
+                    { time: "20:00", title: "miniline & 晚餐", kr: "미니라인", desc: "袖珍模型店 & 路邊攤小吃", type: "food" }
+                ],
+                memos: ["聖水洞：堂山搭 2 號線直達。", "明洞攻略：漫畫街 → Daiso → miniline → 小吃攤晚餐。"]
+            },
+            {
+                day: "Day 4", date: "1/26 (一)", title: "水原華城", weather: { temp: "-6°C", text: "寒冷", icon: "❄️" },
+                events: [
+                    { time: "09:00", title: "前往水原", kr: "수원역", desc: "地鐵車程較長，早點出發", type: "transport" },
+                    { time: "11:00", title: "八達門 & 華城行宮", kr: "화성행궁", desc: "參觀歷史古蹟、《大長今》拍攝地", type: "spot" },
+                    { time: "13:00", title: "午餐：炸雞一條街", kr: "수원통닭거리", desc: "品嚐水原排骨炸雞", type: "food" },
+                    { time: "15:30", title: "城牆漫步", kr: "화홍문", desc: "長安門走到華虹門，景色最美", type: "spot" },
+                    { time: "17:30", title: "星空圖書館 (水原店)", kr: "별마당도서관 수원", desc: "Starfield 購物中心內打卡", type: "spot" }
+                ],
+                memos: ["交通：堂山搭 2 號線轉 1 號線至水原站，轉公車/計程車至八達門。", "城牆：長安門到華虹門這段最平緩好走。"]
+            },
+            {
+                day: "Day 5", date: "1/27 (二)", title: "首爾塔 & 市廳", weather: { temp: "-4°C", text: "晴朗", icon: "☀️" },
+                events: [
+                    { time: "10:15", title: "昌信洞文具玩具街", kr: "동대문 완구거리", desc: "懷舊批發市場", type: "shopping" },
+                    { time: "13:30", title: "DDP & 興仁之門", kr: "DDP", desc: "設計感建築拍照", type: "spot" },
+                    { time: "15:30", title: "南山首爾塔", kr: "N서울타워", desc: "看夕陽、愛情鎖牆", type: "spot" },
+                    { time: "19:30", title: "首爾廣場溜冰", kr: "서울광장 스케이트장", desc: "城市燈光下浪漫溜冰", type: "spot" }
+                ],
+                memos: ["首爾塔交通：DDP 附近搭 01 號循環公車直達。", "下山：強烈建議搭計程車去市廳 (約15分)，省時舒適。"]
+            },
+            {
+                day: "Day 6", date: "1/28 (三)", title: "古宮 & 韓服", weather: { temp: "-3°C", text: "晴時多雲", icon: "⛅" },
+                events: [
+                    { time: "09:45", title: "歷史博物館露台", kr: "대한민국역사박물관", desc: "8樓拍景福宮全景 (必去!)", type: "spot" },
+                    { time: "11:15", title: "通仁市場", kr: "통인시장", desc: "銅錢便當體驗，吃油炸年糕", type: "food" },
+                    { time: "13:00", title: "景福宮 (穿韓服)", kr: "경복궁", desc: "戶外回憶街道復古拍照", type: "spot" },
+                    { time: "17:45", title: "西巡邏街", kr: "서순라길", desc: "沿宗廟石牆路散步賞夕陽", type: "spot" }
+                ],
+                memos: ["西村：堂山搭 2 號線轉 3 號線至景福宮站。", "東村散步：昌德宮正門右轉沿石牆走就是西巡邏街。"]
+            },
+            {
+                day: "Day 7", date: "1/29 (四)", title: "江原道滑雪", weather: { temp: "-8°C", text: "下雪", icon: "🌨️" },
+                events: [
+                    { time: "06:50", title: "弘大集合", kr: "홍대입구역 8번출구", desc: "8號出口，準時出發", type: "transport" },
+                    { time: "10:30", title: "滑雪體驗", kr: "웰리힐리파크", desc: "滑雪教學 + 纜車 + 自由滑雪", type: "spot" },
+                    { time: "17:00", title: "回程巴士", kr: "서울행 버스", desc: "返回弘大", type: "transport" },
+                    { time: "19:00", title: "晚餐：荒謬的生肉", kr: "엉터리생고기 홍대점", desc: "人氣烤肉吃到飽", type: "food" }
+                ],
+                memos: ["集合：務必準時 06:50！", "滑雪：包含 8 小時纜車，16:30 前歸還裝備。"]
+            },
+            {
+                day: "Day 8", date: "1/30 (五)", title: "購物制霸", weather: { temp: "-3°C", text: "多雲", icon: "☁️" },
+                events: [
+                    { time: "10:30", title: "The Hyundai Seoul", kr: "더현대 서울", desc: "5樓空中花園拍照", type: "spot" },
+                    { time: "14:00", title: "高速巴士地下街", kr: "고속터미널 지하상가", desc: "平價服飾快攻", type: "shopping" },
+                    { time: "16:30", title: "弘大商圈", kr: "홍대 걷고싶은거리", desc: "Kakao Friends 旗艦店", type: "shopping" },
+                    { time: "20:30", title: "街頭表演", kr: "홍대 버스킹", desc: "感受週五熱鬧氣氛", type: "spot" }
+                ],
+                memos: ["交通撇步：從高巴去弘大，先搭 9 號線回「堂山站」，站內轉 2 號線直達弘大，不迷路！"]
+            },
+            {
+                day: "Day 9", date: "1/31 (六)", title: "望遠/延南洞 & 返程", weather: { temp: "2°C", text: "晴朗", icon: "☀️" },
+                events: [
+                    { time: "10:30", title: "望遠市場美食", kr: "망원시장", desc: "吃炸雞丁、可樂餅", type: "food" },
+                    { time: "12:30", title: "延南洞咖啡廳", kr: "연남동", desc: "京義線林道散步", type: "food" },
+                    { time: "15:00", title: "回堂山拿行李", kr: "당산역", desc: "最後整理", type: "hotel" },
+                    { time: "15:30", title: "出發去機場", kr: "공항철도", desc: "前往仁川機場 T1", type: "transport" },
+                    { time: "19:45", title: "長榮 BR159 起飛", kr: "인천공항", desc: "回家囉！👋", type: "transport" }
+                ],
+                memos: ["移動：堂山→望遠→延南洞，距離近，建議搭計程車省力。", "機場：預留 1.5 小時交通時間。"]
+            }
+        ];
+
+        // 渲染程式
+        const navContainer = document.getElementById('nav-container');
+        const dayDisplay = document.getElementById('day-display');
+        const weatherDisplay = document.getElementById('weather-display');
+        const weatherIconDisplay = document.getElementById('weather-icon-display');
+        const timelineContainer = document.getElementById('timeline-container');
+        const memoContainer = document.getElementById('memo-container');
+
+        function renderDay(index) {
+            const data = tripData[index];
+            dayDisplay.innerHTML = `${data.day} <span style="font-size:0.8em; font-weight:600; color:#666; margin-left:10px">${data.title}</span>`;
+            weatherDisplay.innerText = `${data.date} | ${data.weather.temp} | ${data.weather.text}`;
+            weatherIconDisplay.innerText = data.weather.icon;
+
+            timelineContainer.innerHTML = '';
+            data.events.forEach(evt => {
+                const krHtml = evt.kr ? `<span class="kr-name">(${evt.kr})</span>` : '';
+                
+                // Naver Map Link
+                const mapHtml = evt.kr ? `<a href="https://map.naver.com/p/search/${evt.kr}" target="_blank" class="naver-map-btn">📍 NAVER Map</a>` : '';
+
+                const cardHtml = `
+                    <div class="event-card" data-type="${evt.type || 'spot'}">
+                        <span class="time-tag">${evt.time}</span>
+                        <div class="location-title">${evt.title}</div>
+                        ${krHtml}
+                        <div class="description">${evt.desc}</div>
+                        ${mapHtml}
+                    </div>
+                `;
+                timelineContainer.innerHTML += cardHtml;
+            });
+
+            let memoHtml = '<ul>';
+            data.memos.forEach(item => {
+                memoHtml += `<li>${item}</li>`;
+            });
+            memoHtml += '</ul>';
+            memoContainer.innerHTML = memoHtml;
+
+            document.querySelectorAll('.day-btn').forEach((btn, idx) => {
+                if(idx === index) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        tripData.forEach((data, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'day-btn';
+            btn.innerText = data.day;
+            btn.onclick = () => renderDay(index);
+            navContainer.appendChild(btn);
+        });
+
+        renderDay(0);
+    </script>
+</body>
+</html>
